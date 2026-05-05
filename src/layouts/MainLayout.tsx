@@ -3,7 +3,7 @@ import { Outlet } from "react-router-dom"
 
 export function MainLayout() {
   return (
-    <div className="mx-auto max-w-480 min-w-0">
+    <div className="mx-auto max-w-480 min-w-0 p-4">
       <Header />
 
       <div>

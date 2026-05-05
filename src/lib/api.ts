@@ -14,12 +14,21 @@ const api = axios.create({
   },
 })
 
+/* Extender tipos de axios para custom config */
+declare module "axios" {
+  interface AxiosRequestConfig {
+    skipGlobalLoading?: boolean
+  }
+}
+
 /* -----------------------------
    REQUEST INTERCEPTOR
 ----------------------------- */
 api.interceptors.request.use((config) => {
-  // 🔵 GLOBAL LOADING START
-  useUIStore.getState().startRequest()
+  // 🔵 GLOBAL LOADING START (solo si no tiene skipGlobalLoading)
+  if (!config.skipGlobalLoading) {
+    useUIStore.getState().startRequest()
+  }
 
   console.log("REQUEST ➜")
   console.log("URL:", (config.baseURL ?? "") + config.url)
@@ -35,8 +44,10 @@ api.interceptors.request.use((config) => {
 ----------------------------- */
 api.interceptors.response.use(
   (response) => {
-    // 🔵 GLOBAL LOADING END
-    useUIStore.getState().endRequest()
+    // 🔵 GLOBAL LOADING END (solo si no tiene skipGlobalLoading)
+    if (!response.config.skipGlobalLoading) {
+      useUIStore.getState().endRequest()
+    }
 
     console.log("RESPONSE ✔")
     console.log("Status:", response.status)
@@ -49,8 +60,10 @@ api.interceptors.response.use(
      RESPONSE ERROR
   ----------------------------- */
   (error) => {
-    // 🔵 IMPORTANT: siempre cerrar loading
-    useUIStore.getState().endRequest()
+    // 🔵 IMPORTANT: siempre cerrar loading (si fue abierto)
+    if (!error.config?.skipGlobalLoading) {
+      useUIStore.getState().endRequest()
+    }
 
     console.log("RESPONSE ERROR ✖")
     console.log("Message:", error.message)

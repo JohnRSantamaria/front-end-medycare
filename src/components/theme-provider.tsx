@@ -16,7 +16,7 @@ type ThemeProviderState = {
   setTheme: (theme: Theme) => void
 }
 
-const COLOR_SCHEME_QUERY = "(prefers-color-scheme: dark)"
+const COLOR_SCHEME_QUERY = "(prefers-color-scheme: light)"
 const THEME_VALUES: Theme[] = ["dark", "light", "system"]
 
 const ThemeProviderContext = React.createContext<
@@ -33,10 +33,10 @@ function isTheme(value: string | null): value is Theme {
 
 function getSystemTheme(): ResolvedTheme {
   if (window.matchMedia(COLOR_SCHEME_QUERY).matches) {
-    return "dark"
+    return "light"
   }
 
-  return "light"
+  return "dark"
 }
 
 function disableTransitionsTemporarily() {
@@ -58,24 +58,24 @@ function disableTransitionsTemporarily() {
   }
 }
 
-// function isEditableTarget(target: EventTarget | null) {
-//   if (!(target instanceof HTMLElement)) {
-//     return false
-//   }
+function isEditableTarget(target: EventTarget | null) {
+  if (!(target instanceof HTMLElement)) {
+    return false
+  }
 
-//   if (target.isContentEditable) {
-//     return true
-//   }
+  if (target.isContentEditable) {
+    return true
+  }
 
-//   const editableParent = target.closest(
-//     "input, textarea, select, [contenteditable='true']"
-//   )
-//   if (editableParent) {
-//     return true
-//   }
+  const editableParent = target.closest(
+    "input, textarea, select, [contenteditable='true']"
+  )
+  if (editableParent) {
+    return true
+  }
 
-//   return false
-// }
+  return false
+}
 
 export function ThemeProvider({
   children,
@@ -140,45 +140,45 @@ export function ThemeProvider({
   }, [theme, applyTheme])
 
   // Cambia el tema al presionar la tecla "d", excepto cuando se está escribiendo en un campo editable
-  // React.useEffect(() => {
-  //   const handleKeyDown = (event: KeyboardEvent) => {
-  //     if (event.repeat) {
-  //       return
-  //     }
+  React.useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.repeat) {
+        return
+      }
 
-  //     if (event.metaKey || event.ctrlKey || event.altKey) {
-  //       return
-  //     }
+      if (event.metaKey || event.ctrlKey || event.altKey) {
+        return
+      }
 
-  //     if (isEditableTarget(event.target)) {
-  //       return
-  //     }
+      if (isEditableTarget(event.target)) {
+        return
+      }
 
-  //     if (event.key.toLowerCase() !== "d") {
-  //       return
-  //     }
+      if (event.key.toLowerCase() !== "d") {
+        return
+      }
 
-  //     setThemeState((currentTheme) => {
-  //       const nextTheme =
-  //         currentTheme === "dark"
-  //           ? "light"
-  //           : currentTheme === "light"
-  //             ? "dark"
-  //             : getSystemTheme() === "dark"
-  //               ? "light"
-  //               : "dark"
+      setThemeState((currentTheme) => {
+        const nextTheme =
+          currentTheme === "dark"
+            ? "light"
+            : currentTheme === "light"
+              ? "dark"
+              : getSystemTheme() === "dark"
+                ? "light"
+                : "dark"
 
-  //       localStorage.setItem(storageKey, nextTheme)
-  //       return nextTheme
-  //     })
-  //   }
+        localStorage.setItem(storageKey, nextTheme)
+        return nextTheme
+      })
+    }
 
-  //   window.addEventListener("keydown", handleKeyDown)
+    window.addEventListener("keydown", handleKeyDown)
 
-  //   return () => {
-  //     window.removeEventListener("keydown", handleKeyDown)
-  //   }
-  // }, [storageKey])
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown)
+    }
+  }, [storageKey])
 
   React.useEffect(() => {
     const handleStorageChange = (event: StorageEvent) => {

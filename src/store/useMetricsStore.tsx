@@ -25,6 +25,7 @@ interface MetricsState {
   }
   error: string | null
   filters: MetricsFilters
+  loading: boolean
 
   fetchMetrics: (filters?: MetricsFilters) => Promise<void>
   setFilters: (filters: MetricsFilters) => void
@@ -42,21 +43,22 @@ export const useMetricsStore = create<MetricsState>((set, get) => ({
     limit: 20,
     offset: 0,
   },
+  loading: false,
 
   setFilters: (filters) => set({ filters }),
 
   fetchMetrics: async (filters?: MetricsFilters) => {
     const currentFilters = filters ?? get().filters
-    set({ error: null })
+    set({ error: null, loading: true })
 
     try {
       const { data } = await api.get<PaginatedResponse<StatsMetricsResponse>>(
         "/stats/metrics",
         {
           params: currentFilters,
+          skipGlobalLoading: true,
         }
       )
-      console.log(`data:  ${data}`)
 
       set({
         data: data.results,
@@ -66,10 +68,12 @@ export const useMetricsStore = create<MetricsState>((set, get) => ({
           previous: data.previous,
         },
         filters: currentFilters,
+        loading: false,
       })
     } catch (err: unknown) {
       set({
         error: (err as Error)?.message ?? "Error fetching metrics",
+        loading: false,
       })
     }
   },

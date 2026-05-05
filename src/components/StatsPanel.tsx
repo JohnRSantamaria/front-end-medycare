@@ -2,43 +2,28 @@ import { useEffect } from "react"
 import { useStatsStore } from "@/store/useStatsStore"
 import { useUIStore } from "@/store/useUIStore"
 import { StatsBarChart } from "./charts/StatsBarChart"
-
-import { Skeleton } from "@/components/ui/skeleton"
 import { MetricsTable } from "./tables/MetricsTable"
-import { useMetricsStore } from "@/store/useMetricsStore"
+import { Loader2 } from "lucide-react"
 
 export function StatsPanel() {
   const { data, error, fetchStats } = useStatsStore()
   const loading = useUIStore((state) => state.loading)
-  const { fetchMetrics } = useMetricsStore()
+
   useEffect(() => {
     fetchStats()
-    fetchMetrics()
-  }, [fetchStats, fetchMetrics])
+  }, [fetchStats])
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-480 p-4">
-        {/* Chart interactions section */}
-        <div>
-          <h2 className="mb-4 text-lg font-semibold">
-            Cargando estadísticas de interacciones...{" "}
-          </h2>
-          <div className="mt-18 grid grid-cols-4 gap-4">
-            <Skeleton className="h-40 w-full" />
-            <Skeleton className="h-40 w-full" />
-            <Skeleton className="h-40 w-full" />
-            <Skeleton className="h-40 w-full" />
-          </div>
-        </div>
+      <div className="flex w-full items-center justify-center p-4 text-primary">
+        <Loader2 className="h-auto w-8 animate-spin" />
       </div>
     )
   }
   if (error) return <p>Error: {error}</p>
 
   return (
-    <div className="mx-auto max-w-480 p-4">
-      {/* Chart interactions section */}
+    <>
       <div>
         <h2 className="mb-4 text-lg font-semibold">
           Estadísticas de Interacciones{" "}
@@ -52,6 +37,6 @@ export function StatsPanel() {
         <h1 className="mb-4 text-2xl font-bold">Métricas</h1>
         <MetricsTable />
       </div>
-    </div>
+    </>
   )
 }
